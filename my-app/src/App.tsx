@@ -13,6 +13,7 @@ type GroupedEntries = {
 };
 
 const STORAGE_KEY = 'breastfeeding-timestamps';
+const INTERVAL_STORAGE_KEY = 'breastfeeding-interval-hours';
 
 const createId = () =>
   crypto.randomUUID
@@ -64,12 +65,37 @@ const loadStoredEntries = (): TimestampEntry[] => {
   }
 };
 
+const loadIntervalHours = () => {
+  const raw = localStorage.getItem(INTERVAL_STORAGE_KEY);
+  const parsed = raw ? parseInt(raw, 10) : 3;
+  return [1, 2, 3, 4].includes(parsed) ? parsed : 3;
+};
+
 function App() {
   const [entries, setEntries] = useState<TimestampEntry[]>(() => loadStoredEntries());
+  const [intervalHours, setIntervalHours] = useState<number>(() => loadIntervalHours());
 
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
   }, [entries]);
+
+  useEffect(() => {
+    localStorage.setItem(INTERVAL_STORAGE_KEY, String(intervalHours));
+  }, [intervalHours]);
+
+  const latestEntry = useMemo(() => {
+    if (!entries.length) return null;
+    return entries.reduce((latest, current) =>
+      new Date(current.iso).getTime() > new Date(latest.iso).getTime() ? current : latest
+    );
+  }, [entries]);
+
+  const nextFeedingIso = useMemo(() => {
+    if (!latestEntry) return null;
+    const next = new Date(latestEntry.iso);
+    next.setHours(next.getHours() + intervalHours);
+    return next.toISOString();
+  }, [latestEntry, intervalHours]);
 
   const grouped = useMemo<GroupedEntries[]>(() => {
     const sorted = [...entries].sort(
@@ -119,6 +145,36 @@ function App() {
           </div>
         </header>
 
+        <section className="next">
+          <div>
+            <p className="eyebrow">Next feeding</p>
+            {nextFeedingIso ? (
+              <>
+                <h2>{formatTimeLabel(nextFeedingIso)}</h2>
+                <p className="lede">
+                  Based on your last log at {formatTimeLabel(latestEntry!.iso)} and a {intervalHours}h interval.
+                </p>
+              </>
+            ) : (
+              <>
+                <h2>Log a feeding to start the timer</h2>
+                <p className="lede">Choose an interval and tap “Log now” when you feed.</p>
+              </>
+            )}
+          </div>
+          <div className="chips" role="group" aria-label="Next feeding interval">
+            {[1, 2, 3, 4].map((hours) => (
+              <button
+                key={hours}
+                className={`chip ${intervalHours === hours ? 'chip--active' : ''}`}
+                onClick={() => setIntervalHours(hours)}
+              >
+                {hours}h
+              </button>
+            ))}
+          </div>
+        </section>
+
         <section className="actions">
           <div className="actions__summary">
             <span className="dot" aria-hidden="true" />
@@ -142,6 +198,8 @@ function App() {
             </div>
           </div>
         </section>
+
+
 
         {hasEntries ? (
           <div className="groups" role="list">
