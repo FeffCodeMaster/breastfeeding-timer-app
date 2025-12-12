@@ -71,9 +71,33 @@ const loadIntervalHours = () => {
   return [1, 2, 3, 4].includes(parsed) ? parsed : 3;
 };
 
+const calculateAverageMinutes = (list: TimestampEntry[]) => {
+  if (list.length < 2) return null;
+
+  const sorted = [...list].sort(
+    (a, b) => new Date(a.iso).getTime() - new Date(b.iso).getTime()
+  );
+
+  let total = 0;
+  for (let i = 1; i < sorted.length; i += 1) {
+    total += (new Date(sorted[i].iso).getTime() - new Date(sorted[i - 1].iso).getTime()) / 60000;
+  }
+
+  return total / (sorted.length - 1);
+};
+
+const formatInterval = (minutes: number | null) => {
+  if (minutes === null) return '—';
+  const hours = Math.floor(minutes / 60);
+  const remaining = Math.round(minutes - hours * 60);
+  if (hours <= 0) return `${remaining}m`;
+  return `${hours}h ${remaining}m`;
+};
+
 function App() {
   const [entries, setEntries] = useState<TimestampEntry[]>(() => loadStoredEntries());
   const [intervalHours, setIntervalHours] = useState<number>(() => loadIntervalHours());
+  const todayKey = useMemo(() => toDateKey(new Date().toISOString()), []);
 
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
@@ -120,6 +144,13 @@ function App() {
     }));
   }, [entries]);
 
+  const averageAllMinutes = useMemo(() => calculateAverageMinutes(entries), [entries]);
+
+  const averageTodayMinutes = useMemo(
+    () => calculateAverageMinutes(entries.filter((entry) => toDateKey(entry.iso) === todayKey)),
+    [entries, todayKey]
+  );
+
   const handleAdd = () => {
     const now = new Date().toISOString();
     setEntries((prev) => [{ id: createId(), iso: now }, ...prev]);
@@ -144,6 +175,30 @@ function App() {
             <h1>🤱 Feeding Logger </h1>
           </div>
         </header>
+
+        <section className="actions">
+          <div className="actions__summary">
+            <span className="dot" aria-hidden="true" />
+            <span>{hasEntries ? `${entries.length} saved` : 'No timestamps yet'}</span>
+          </div>
+          <div className="actions__buttons">
+            <button className="primary" onClick={handleAdd}>
+              Log new feeding
+            </button>
+            <div className="menu">
+              <details>
+                <summary aria-label="More actions" title="More actions">
+                  <span className="menu__dots" aria-hidden="true">···</span>
+                </summary>
+                <div className="menu__sheet">
+                  <button className="ghost" onClick={handleClear} disabled={!hasEntries}>
+                    Clear list
+                  </button>
+                </div>
+              </details>
+            </div>
+          </div>
+        </section>
 
         <section className="next">
           <div>
@@ -175,37 +230,32 @@ function App() {
           </div>
         </section>
 
-        <section className="actions">
-          <div className="actions__summary">
-            <span className="dot" aria-hidden="true" />
-            <span>{hasEntries ? `${entries.length} saved` : 'No timestamps yet'}</span>
+        <section className="averages" aria-label="Average intervals">
+          <div className="average-card">
+            <p className="eyebrow">All time average</p>
+            <h3>{formatInterval(averageAllMinutes)}</h3>
+            <p className="lede lede--small">Typical gap across every logged feeding.</p>
           </div>
-          <div className="actions__buttons">
-            <button className="primary" onClick={handleAdd}>
-              Log now
-            </button>
-            <div className="menu">
-              <details>
-                <summary aria-label="More actions" title="More actions">
-                  <span className="menu__dots" aria-hidden="true">···</span>
-                </summary>
-                <div className="menu__sheet">
-                  <button className="ghost" onClick={handleClear} disabled={!hasEntries}>
-                    Clear list
-                  </button>
-                </div>
-              </details>
-            </div>
+          <div className="average-card">
+            <p className="eyebrow">Today average</p>
+            <h3>{formatInterval(averageTodayMinutes)}</h3>
+            <p className="lede lede--small">Based only on entries from today.</p>
           </div>
         </section>
-
-
 
         {hasEntries ? (
           <div className="groups" role="list">
             {grouped.map((group) => (
               <div key={group.key} className="group" role="listitem">
-                <div className="group__title">{group.label}</div>
+                <div className="group__heading">
+                  <div className="group__title">{group.label}</div>
+                  <div className="group__average" aria-label={`Average interval for ${group.label}`}>
+                    <p className="group__average-label">Average gap</p>
+                    <p className="group__average-value">
+                      {formatInterval(calculateAverageMinutes(group.entries))}
+                    </p>
+                  </div>
+                </div>
                 <ul className="times">
                   {group.entries.map((entry) => (
                     <li key={entry.id} className="times__item">

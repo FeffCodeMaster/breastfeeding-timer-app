@@ -34,6 +34,28 @@
   color: #475569;
   max-width: 480px;
 }
+.lede--small {
+  font-size: 13px;
+  max-width: 360px;
+}
+
+.averages {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 12px;
+}
+
+.average-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 14px 16px;
+}
+
+.average-card h3 {
+  margin: 6px 0 4px;
+  font-size: 22px;
+}
 
 .actions {
   display: flex;
@@ -198,9 +220,32 @@
   background: #ffffff;
 }
 
+.group__heading {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
 .group__title {
   font-weight: 700;
-  margin-bottom: 8px;
+  color: #0f172a;
+}
+
+.group__average {
+  text-align: right;
+}
+
+.group__average-label {
+  margin: 0;
+  font-size: 12px;
+  color: #475569;
+}
+
+.group__average-value {
+  margin: 0;
+  font-weight: 700;
   color: #0f172a;
 }
 
@@ -288,4 +333,5 @@
     flex: 1;
     text-align: center;
   }
+
 }
