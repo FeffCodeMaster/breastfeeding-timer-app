@@ -140,7 +140,7 @@ function App() {
       <main className="panel">
         <header className="panel__header">
           <div>
-            <p className="eyebrow">IB's Breastfeeding App</p>
+            <p className="eyebrow">Breastfeeding App</p>
             <h1>🤱 Feeding Logger </h1>
           </div>
         </header>
