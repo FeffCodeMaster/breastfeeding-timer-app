@@ -222,15 +222,39 @@
 
 .group__heading {
   display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: 12px;
+  flex-direction: column;
+  gap: 6px;
   margin-bottom: 8px;
 }
 
 .group__title {
   font-weight: 700;
   color: #0f172a;
+}
+
+.group__meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.dvitamin {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 600;
+  color: #0f172a;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 6px 10px;
+  background: #f8fafc;
+}
+
+.dvitamin input {
+  width: 16px;
+  height: 16px;
 }
 
 .group__average {

@@ -14,6 +14,7 @@ type GroupedEntries = {
 
 const STORAGE_KEY = 'breastfeeding-timestamps';
 const INTERVAL_STORAGE_KEY = 'breastfeeding-interval-hours';
+const D_VITAMIN_STORAGE_KEY = 'breastfeeding-dvitamin-days';
 
 const createId = () =>
   crypto.randomUUID
@@ -71,6 +72,23 @@ const loadIntervalHours = () => {
   return [1, 2, 3, 4].includes(parsed) ? parsed : 3;
 };
 
+const loadDVitaminMap = () => {
+  const raw = localStorage.getItem(D_VITAMIN_STORAGE_KEY);
+  if (!raw) return {} as Record<string, boolean>;
+  try {
+    const parsed = JSON.parse(raw);
+    if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
+      const entries = Object.entries(parsed).filter(
+        ([key, value]) => typeof key === 'string' && typeof value === 'boolean'
+      );
+      return Object.fromEntries(entries) as Record<string, boolean>;
+    }
+    return {};
+  } catch {
+    return {};
+  }
+};
+
 const calculateAverageMinutes = (list: TimestampEntry[]) => {
   if (list.length < 2) return null;
 
@@ -97,6 +115,7 @@ const formatInterval = (minutes: number | null) => {
 function App() {
   const [entries, setEntries] = useState<TimestampEntry[]>(() => loadStoredEntries());
   const [intervalHours, setIntervalHours] = useState<number>(() => loadIntervalHours());
+  const [dVitaminMap, setDVitaminMap] = useState<Record<string, boolean>>(() => loadDVitaminMap());
   const todayKey = useMemo(() => toDateKey(new Date().toISOString()), []);
 
   useEffect(() => {
@@ -106,6 +125,10 @@ function App() {
   useEffect(() => {
     localStorage.setItem(INTERVAL_STORAGE_KEY, String(intervalHours));
   }, [intervalHours]);
+
+  useEffect(() => {
+    localStorage.setItem(D_VITAMIN_STORAGE_KEY, JSON.stringify(dVitaminMap));
+  }, [dVitaminMap]);
 
   const latestEntry = useMemo(() => {
     if (!entries.length) return null;
@@ -162,6 +185,13 @@ function App() {
 
   const handleClear = () => {
     setEntries([]);
+  };
+
+  const toggleDVitaminForDay = (dayKey: string) => {
+    setDVitaminMap((prev) => ({
+      ...prev,
+      [dayKey]: !prev[dayKey],
+    }));
   };
 
   const hasEntries = entries.length > 0;
@@ -249,11 +279,22 @@ function App() {
               <div key={group.key} className="group" role="listitem">
                 <div className="group__heading">
                   <div className="group__title">{group.label}</div>
-                  <div className="group__average" aria-label={`Average interval for ${group.label}`}>
-                    <p className="group__average-label">Average gap</p>
-                    <p className="group__average-value">
-                      {formatInterval(calculateAverageMinutes(group.entries))}
-                    </p>
+                  <div className="group__meta">
+                    <label className="dvitamin">
+                      <input
+                        type="checkbox"
+                        checked={Boolean(dVitaminMap[group.key])}
+                        onChange={() => toggleDVitaminForDay(group.key)}
+                        aria-label={`D-vitamin given on ${group.label}`}
+                      />
+                      <span>D-vitamin</span>
+                    </label>
+                    <div className="group__average" aria-label={`Average interval for ${group.label}`}>
+                      <p className="group__average-label">Average gap</p>
+                      <p className="group__average-value">
+                        {formatInterval(calculateAverageMinutes(group.entries))}
+                      </p>
+                    </div>
                   </div>
                 </div>
                 <ul className="times">
