@@ -147,7 +147,7 @@ function App() {
 
         <section className="next">
           <div>
-            <p className="eyebrow">Next feeding</p>
+            <p className="eyebrow">Next feeding before</p>
             {nextFeedingIso ? (
               <>
                 <h2>{formatTimeLabel(nextFeedingIso)}</h2>
