@@ -114,8 +114,8 @@ function App() {
       <main className="panel">
         <header className="panel__header">
           <div>
-            <p className="eyebrow"> IB's Breastfeeding App</p>
-            <h1>🤱 Log feedings in one tap</h1>
+            <p className="eyebrow">IB's Breastfeeding App</p>
+            <h1>🤱 Feeding Timer </h1>
           </div>
         </header>
 
