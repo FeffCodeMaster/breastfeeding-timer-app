@@ -37,8 +37,9 @@ const formatDateLabel = (iso: string) =>
 
 const formatTimeLabel = (iso: string) =>
   new Date(iso).toLocaleTimeString([], {
-    hour: 'numeric',
+    hour: '2-digit',
     minute: '2-digit',
+    hour12: false,
   });
 
 const loadStoredEntries = (): TimestampEntry[] => {
@@ -113,11 +114,8 @@ function App() {
       <main className="panel">
         <header className="panel__header">
           <div>
-            <p className="eyebrow">Breastfeeding timer</p>
-            <h1>Log feedings in one tap</h1>
-            <p className="lede">
-              Capture a timestamp instantly and keep a tidy history grouped by day.
-            </p>
+            <p className="eyebrow"> IB's Breastfeeding App</p>
+            <h1>🤱 Log feedings in one tap</h1>
           </div>
         </header>
 
@@ -130,9 +128,18 @@ function App() {
             <button className="primary" onClick={handleAdd}>
               Log now
             </button>
-            <button className="ghost" onClick={handleClear} disabled={!hasEntries}>
-              Clear list
-            </button>
+            <div className="menu">
+              <details>
+                <summary aria-label="More actions" title="More actions">
+                  <span className="menu__dots" aria-hidden="true">···</span>
+                </summary>
+                <div className="menu__sheet">
+                  <button className="ghost" onClick={handleClear} disabled={!hasEntries}>
+                    Clear list
+                  </button>
+                </div>
+              </details>
+            </div>
           </div>
         </section>
 

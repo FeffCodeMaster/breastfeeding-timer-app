@@ -3,17 +3,13 @@
   display: flex;
   justify-content: center;
   padding: 32px;
-  background: radial-gradient(120% 120% at 20% 20%, #e0f2fe 0, #f8fafc 40%, #f1f5f9 100%);
+  background: linear-gradient(#AEFF96 25%, #86BEFF 100%);
   color: #0f172a;
   font-family: 'Segoe UI', 'Helvetica Neue', sans-serif;
 }
 
 .panel {
   width: min(720px, 100%);
-  background: #ffffff;
-  border: 1px solid #e2e8f0;
-  border-radius: 16px;
-  box-shadow: 0 14px 45px rgba(15, 23, 42, 0.08);
   padding: 24px 24px 16px;
   display: flex;
   flex-direction: column;
@@ -69,6 +65,42 @@
 .actions__buttons {
   display: flex;
   gap: 8px;
+}
+
+.menu details {
+  position: relative;
+}
+
+.menu summary {
+  list-style: none;
+  border-radius: 10px;
+  border: 1px solid #e2e8f0;
+  padding: 8px 10px;
+  cursor: pointer;
+  background: #fff;
+}
+
+.menu summary::-webkit-details-marker {
+  display: none;
+}
+
+.menu__dots {
+  display: inline-block;
+  letter-spacing: 2px;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.menu__sheet {
+  position: absolute;
+  right: 0;
+  margin-top: 8px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.2);
+  padding: 8px;
+  z-index: 10;
 }
 
 .primary,
