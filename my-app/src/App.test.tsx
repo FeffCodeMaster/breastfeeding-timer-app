@@ -2,8 +2,9 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import App from './App';
 
-test('renders learn react link', () => {
+test('shows log button and empty prompt', () => {
   render(<App />);
-  const linkElement = screen.getByText(/learn react/i);
-  expect(linkElement).toBeInTheDocument();
+  expect(screen.getByRole('button', { name: /log now/i })).toBeInTheDocument();
+  expect(screen.getByRole('button', { name: /clear list/i })).toBeDisabled();
+  expect(screen.getByText(/add your first timestamp/i)).toBeInTheDocument();
 });
