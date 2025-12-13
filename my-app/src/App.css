@@ -297,16 +297,39 @@
   font-weight: 700;
 }
 
-.icon-button {
-  border: none;
-  background: transparent;
-  color: #ef4444;
-  font-weight: 700;
-  cursor: pointer;
+.times__actions details {
+  position: relative;
 }
 
-.icon-button:hover {
-  text-decoration: underline;
+.times__summary {
+  list-style: none;
+  border: 1px solid #cbd5e1;
+  padding: 6px 8px;
+  border-radius: 8px;
+  cursor: pointer;
+  background: #ffffff;
+}
+
+.times__summary::-webkit-details-marker {
+  display: none;
+}
+
+.times__menu {
+  position: absolute;
+  right: 0;
+  margin-top: 6px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.2);
+  padding: 6px;
+  z-index: 5;
+}
+
+.ghost--danger {
+  color: #ef4444;
+  border-color: #fecdd3;
+  background: #fff1f2;
 }
 
 .empty-state {

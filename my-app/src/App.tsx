@@ -301,13 +301,26 @@ function App() {
                   {group.entries.map((entry) => (
                     <li key={entry.id} className="times__item">
                       <span className="time">{formatTimeLabel(entry.iso)}</span>
-                      <button
-                        className="icon-button"
-                        onClick={() => handleRemove(entry.id)}
-                        aria-label={`Remove timestamp at ${formatTimeLabel(entry.iso)}`}
-                      >
-                        Remove
-                      </button>
+                      <div className="times__actions">
+                        <details>
+                          <summary
+                            aria-label="More actions for this entry"
+                            title="More actions"
+                            className="times__summary"
+                          >
+                            <span aria-hidden="true">···</span>
+                          </summary>
+                          <div className="times__menu">
+                            <button
+                              className="ghost ghost--danger"
+                              onClick={() => handleRemove(entry.id)}
+                              aria-label={`Remove timestamp at ${formatTimeLabel(entry.iso)}`}
+                            >
+                              Remove
+                            </button>
+                          </div>
+                        </details>
+                      </div>
                     </li>
                   ))}
                 </ul>
