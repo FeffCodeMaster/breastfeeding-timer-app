@@ -16,6 +16,13 @@
   gap: 20px;
 }
 
+.panel__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+}
+
 .panel__header h1 {
   margin: 4px 0 8px;
   font-size: 26px;
@@ -34,6 +41,7 @@
   color: #475569;
   max-width: 480px;
 }
+
 .lede--small {
   font-size: 13px;
   max-width: 360px;
@@ -41,7 +49,7 @@
 
 .averages {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 12px;
 }
 
@@ -55,6 +63,75 @@
 .average-card h3 {
   margin: 6px 0 4px;
   font-size: 22px;
+}
+
+.diaper-section {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 16px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+}
+
+.feeding-section {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 16px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+}
+
+.diaper-total-row {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.diaper-total-row h3 {
+  margin: 0;
+}
+
+.diaper-total-note {
+  color: #475569;
+  font-size: 14px;
+}
+
+.feeding-total-row {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.feeding-total-row h3 {
+  margin: 0;
+}
+
+.feeding-total-note {
+  color: #475569;
+  font-size: 14px;
+}
+
+.diaper-stats {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.diaper-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 12px 14px;
+}
+
+.diaper-card h3 {
+  margin: 4px 0;
 }
 
 .actions {
@@ -240,6 +317,26 @@
   flex-wrap: wrap;
 }
 
+.group__diapers {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  background: #ffffff;
+}
+
+.group__diapers-count {
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.group__diapers-label {
+  color: #475569;
+  font-size: 13px;
+}
+
 .dvitamin {
   display: inline-flex;
   align-items: center;
@@ -379,6 +476,16 @@
   .chip {
     flex: 1;
     text-align: center;
+  }
+
+  .diaper-section {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .feeding-section {
+    flex-direction: column;
+    align-items: flex-start;
   }
 
 }

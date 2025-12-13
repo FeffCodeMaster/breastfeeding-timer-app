@@ -15,6 +15,7 @@ type GroupedEntries = {
 const STORAGE_KEY = 'breastfeeding-timestamps';
 const INTERVAL_STORAGE_KEY = 'breastfeeding-interval-hours';
 const D_VITAMIN_STORAGE_KEY = 'breastfeeding-dvitamin-days';
+const DIAPER_STORAGE_KEY = 'breastfeeding-diaper-timestamps';
 
 const createId = () =>
   crypto.randomUUID
@@ -66,6 +67,25 @@ const loadStoredEntries = (): TimestampEntry[] => {
   }
 };
 
+const loadStoredDiapers = (): TimestampEntry[] => {
+  const raw = localStorage.getItem(DIAPER_STORAGE_KEY);
+  if (!raw) return [];
+
+  try {
+    const parsed = JSON.parse(raw);
+    if (!Array.isArray(parsed)) return [];
+    return parsed
+      .map((item) =>
+        item && typeof item.id === 'string' && typeof item.iso === 'string'
+          ? { id: item.id, iso: item.iso }
+          : null
+      )
+      .filter((item): item is TimestampEntry => Boolean(item));
+  } catch {
+    return [];
+  }
+};
+
 const loadIntervalHours = () => {
   const raw = localStorage.getItem(INTERVAL_STORAGE_KEY);
   const parsed = raw ? parseInt(raw, 10) : 3;
@@ -105,17 +125,24 @@ const calculateAverageMinutes = (list: TimestampEntry[]) => {
 };
 
 const formatInterval = (minutes: number | null) => {
-  if (minutes === null) return '—';
+  if (minutes === null) return '--';
   const hours = Math.floor(minutes / 60);
   const remaining = Math.round(minutes - hours * 60);
   if (hours <= 0) return `${remaining}m`;
   return `${hours}h ${remaining}m`;
 };
 
+const formatAverageCount = (value: number | null) => {
+  if (value === null) return '--';
+  const rounded = Number(value.toFixed(1));
+  return Number.isInteger(rounded) ? `${rounded}` : rounded.toFixed(1);
+};
+
 function App() {
   const [entries, setEntries] = useState<TimestampEntry[]>(() => loadStoredEntries());
   const [intervalHours, setIntervalHours] = useState<number>(() => loadIntervalHours());
   const [dVitaminMap, setDVitaminMap] = useState<Record<string, boolean>>(() => loadDVitaminMap());
+  const [diaperEntries, setDiaperEntries] = useState<TimestampEntry[]>(() => loadStoredDiapers());
   const todayKey = useMemo(() => toDateKey(new Date().toISOString()), []);
 
   useEffect(() => {
@@ -129,6 +156,10 @@ function App() {
   useEffect(() => {
     localStorage.setItem(D_VITAMIN_STORAGE_KEY, JSON.stringify(dVitaminMap));
   }, [dVitaminMap]);
+
+  useEffect(() => {
+    localStorage.setItem(DIAPER_STORAGE_KEY, JSON.stringify(diaperEntries));
+  }, [diaperEntries]);
 
   const latestEntry = useMemo(() => {
     if (!entries.length) return null;
@@ -174,6 +205,22 @@ function App() {
     [entries, todayKey]
   );
 
+  const diaperCountsByDay = useMemo(() => {
+    const map = new Map<string, number>();
+    diaperEntries.forEach((entry) => {
+      const key = toDateKey(entry.iso);
+      map.set(key, (map.get(key) || 0) + 1);
+    });
+    return map;
+  }, [diaperEntries]);
+
+  const totalDiapers = diaperEntries.length;
+  const diaperAveragePerDay = useMemo(() => {
+    const dayCount = diaperCountsByDay.size;
+    if (!dayCount) return null;
+    return totalDiapers / dayCount;
+  }, [diaperCountsByDay, totalDiapers]);
+
   const handleAdd = () => {
     const now = new Date().toISOString();
     setEntries((prev) => [{ id: createId(), iso: now }, ...prev]);
@@ -187,6 +234,10 @@ function App() {
     setEntries([]);
   };
 
+  const handleClearDiapers = () => {
+    setDiaperEntries([]);
+  };
+
   const toggleDVitaminForDay = (dayKey: string) => {
     setDVitaminMap((prev) => ({
       ...prev,
@@ -196,38 +247,47 @@ function App() {
 
   const hasEntries = entries.length > 0;
 
+  const handleAddDiaper = () => {
+    const now = new Date().toISOString();
+    setDiaperEntries((prev) => [{ id: createId(), iso: now }, ...prev]);
+  };
+
   return (
     <div className="app">
       <main className="panel">
         <header className="panel__header">
           <div>
             <p className="eyebrow">Breastfeeding App</p>
-            <h1>🤱 Feeding Logger </h1>
+            <h1>Feed & Diaper Logger</h1>
+          </div>
+          <div className="panel__menu menu">
+            <details>
+              <summary aria-label="More actions" title="More actions">
+                <span className="menu__dots" aria-hidden="true">...</span>
+              </summary>
+              <div className="menu__sheet">
+                <button className="ghost" onClick={handleClear} disabled={!hasEntries}>
+                  Clear feedings
+                </button>
+                <button className="ghost" onClick={handleClearDiapers} disabled={totalDiapers === 0}>
+                  Clear diapers
+                </button>
+              </div>
+            </details>
           </div>
         </header>
 
-        <section className="actions">
-          <div className="actions__summary">
-            <span className="dot" aria-hidden="true" />
-            <span>{hasEntries ? `${entries.length} saved` : 'No timestamps yet'}</span>
-          </div>
-          <div className="actions__buttons">
-            <button className="primary" onClick={handleAdd}>
-              Log new feeding
-            </button>
-            <div className="menu">
-              <details>
-                <summary aria-label="More actions" title="More actions">
-                  <span className="menu__dots" aria-hidden="true">···</span>
-                </summary>
-                <div className="menu__sheet">
-                  <button className="ghost" onClick={handleClear} disabled={!hasEntries}>
-                    Clear list
-                  </button>
-                </div>
-              </details>
+        <section className="feeding-section">
+          <div>
+            <p className="eyebrow">All time feedings</p>
+            <div className="feeding-total-row">
+              <h3>{entries.length}</h3>
+              <span className="feeding-total-note">Total feedings logged.</span>
             </div>
           </div>
+          <button className="primary" onClick={handleAdd}>
+            Log 🍼
+          </button>
         </section>
 
         <section className="next">
@@ -243,7 +303,7 @@ function App() {
             ) : (
               <>
                 <h2>Log a feeding to start the timer</h2>
-                <p className="lede">Choose an interval and tap “Log now” when you feed.</p>
+                <p className="lede">Choose an interval and tap "Log now" when you feed.</p>
               </>
             )}
           </div>
@@ -260,6 +320,7 @@ function App() {
           </div>
         </section>
 
+
         <section className="averages" aria-label="Average intervals">
           <div className="average-card">
             <p className="eyebrow">All time average</p>
@@ -272,6 +333,37 @@ function App() {
             <p className="lede lede--small">Based only on entries from today.</p>
           </div>
         </section>
+
+        <section className="diaper-section">
+          <div>
+            <p className="eyebrow">All time diapers</p>
+            <div className="diaper-total-row">
+              <h3>{totalDiapers}</h3>
+              <span className="diaper-total-note">Total changes logged.</span>
+            </div>
+          </div>
+          <button className="primary" onClick={handleAddDiaper}>
+            Log 💩
+          </button>
+        </section>
+
+
+
+        <section className="diaper-stats" aria-label="Diaper stats">
+          <div className="diaper-card">
+            <p className="eyebrow">Average per day</p>
+            <h3>{formatAverageCount(diaperAveragePerDay)}</h3>
+            <p className="lede lede--small">Across days with diaper logs.</p>
+          </div>
+          <div className="diaper-card">
+            <p className="eyebrow">Today</p>
+            <h3>{diaperCountsByDay.get(todayKey) || 0}</h3>
+            <p className="lede lede--small">Logged diapars so far today.</p>
+          </div>
+        </section>
+
+
+
 
         {hasEntries ? (
           <div className="groups" role="list">
@@ -289,6 +381,10 @@ function App() {
                       />
                       <span>D-vitamin</span>
                     </label>
+                    <div className="group__diapers" aria-label={`Diapers for ${group.label}`}>
+                      <span className="group__diapers-count">{diaperCountsByDay.get(group.key) || 0}</span>
+                      <span className="group__diapers-label">diapers</span>
+                    </div>
                     <div className="group__average" aria-label={`Average interval for ${group.label}`}>
                       <p className="group__average-label">Average gap</p>
                       <p className="group__average-value">
@@ -308,7 +404,7 @@ function App() {
                             title="More actions"
                             className="times__summary"
                           >
-                            <span aria-hidden="true">···</span>
+                            <span aria-hidden="true">...</span>
                           </summary>
                           <div className="times__menu">
                             <button
