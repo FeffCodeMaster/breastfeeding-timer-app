@@ -258,7 +258,7 @@ function App() {
         <header className="panel__header">
           <div>
             <p className="eyebrow">Breastfeeding App</p>
-            <h1>🤱 Feed & Diaper Logger</h1>
+            <h1>🤱🍼💩 Logger</h1>
           </div>
           <div className="panel__menu menu">
             <details>
