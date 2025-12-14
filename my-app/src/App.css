@@ -317,6 +317,26 @@
   flex-wrap: wrap;
 }
 
+.group__feedings {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  background: #ffffff;
+}
+
+.group__feedings-count {
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.group__feedings-label {
+  color: #475569;
+  font-size: 13px;
+}
+
 .group__diapers {
   display: inline-flex;
   align-items: center;

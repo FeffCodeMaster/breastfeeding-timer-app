@@ -347,8 +347,6 @@ function App() {
           </button>
         </section>
 
-
-
         <section className="diaper-stats" aria-label="Diaper stats">
           <div className="diaper-card">
             <p className="eyebrow">Average per day</p>
@@ -361,9 +359,6 @@ function App() {
             <p className="lede lede--small">Logged diapars so far today.</p>
           </div>
         </section>
-
-
-
 
         {hasEntries ? (
           <div className="groups" role="list">
@@ -384,6 +379,10 @@ function App() {
                     <div className="group__diapers" aria-label={`Diapers for ${group.label}`}>
                       <span className="group__diapers-count">{diaperCountsByDay.get(group.key) || 0}</span>
                       <span className="group__diapers-label">diapers</span>
+                    </div>
+                    <div className="group__feedings" aria-label={`Feedings for ${group.label}`}>
+                      <span className="group__feedings-count">{group.entries.length}</span>
+                      <span className="group__feedings-label">feedings</span>
                     </div>
                     <div className="group__average" aria-label={`Average interval for ${group.label}`}>
                       <p className="group__average-label">Average gap</p>
