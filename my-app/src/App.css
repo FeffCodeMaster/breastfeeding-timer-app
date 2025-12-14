@@ -87,6 +87,14 @@
   border-radius: 12px;
 }
 
+.feeding-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  width: 100%;
+}
+
 .diaper-total-row {
   display: inline-flex;
   align-items: baseline;
@@ -115,6 +123,42 @@
 .feeding-total-note {
   color: #475569;
   font-size: 14px;
+}
+
+.manual-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.manual-card__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.manual-card__field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.manual-card__field input {
+  padding: 10px;
+  border-radius: 10px;
+  border: 1px solid #cbd5e1;
+  font-size: 15px;
+}
+
+.manual-card__actions {
+  display: flex;
+  justify-content: flex-end;
 }
 
 .diaper-stats {
@@ -506,6 +550,10 @@
   .feeding-section {
     flex-direction: column;
     align-items: flex-start;
+  }
+
+  .manual-card__actions {
+    width: 100%;
   }
 
 }

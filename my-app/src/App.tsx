@@ -138,11 +138,23 @@ const formatAverageCount = (value: number | null) => {
   return Number.isInteger(rounded) ? `${rounded}` : rounded.toFixed(1);
 };
 
+const toLocalInputValue = (date: Date) => {
+  const pad = (n: number) => String(n).padStart(2, '0');
+  const year = date.getFullYear();
+  const month = pad(date.getMonth() + 1);
+  const day = pad(date.getDate());
+  const hours = pad(date.getHours());
+  const minutes = pad(date.getMinutes());
+  return `${year}-${month}-${day}T${hours}:${minutes}`;
+};
+
 function App() {
   const [entries, setEntries] = useState<TimestampEntry[]>(() => loadStoredEntries());
   const [intervalHours, setIntervalHours] = useState<number>(() => loadIntervalHours());
   const [dVitaminMap, setDVitaminMap] = useState<Record<string, boolean>>(() => loadDVitaminMap());
   const [diaperEntries, setDiaperEntries] = useState<TimestampEntry[]>(() => loadStoredDiapers());
+  const [manualOpen, setManualOpen] = useState(false);
+  const [manualDateTime, setManualDateTime] = useState<string>(() => toLocalInputValue(new Date()));
   const todayKey = useMemo(() => toDateKey(new Date().toISOString()), []);
 
   useEffect(() => {
@@ -226,6 +238,22 @@ function App() {
     setEntries((prev) => [{ id: createId(), iso: now }, ...prev]);
   };
 
+  const handleManualAdd = () => {
+    if (!manualDateTime) return;
+    const iso = new Date(manualDateTime).toISOString();
+    setEntries((prev) => [{ id: createId(), iso }, ...prev]);
+    setManualOpen(false);
+  };
+
+  const openManual = () => {
+    setManualDateTime(toLocalInputValue(new Date()));
+    setManualOpen(true);
+  };
+
+  const cancelManual = () => {
+    setManualOpen(false);
+  };
+
   const handleRemove = (id: string) => {
     setEntries((prev) => prev.filter((entry) => entry.id !== id));
   };
@@ -258,7 +286,7 @@ function App() {
         <header className="panel__header">
           <div>
             <p className="eyebrow">Breastfeeding App</p>
-            <h1>🤱🍼💩 Logger</h1>
+            <h1>Feeding Logger</h1>
           </div>
           <div className="panel__menu menu">
             <details>
@@ -285,10 +313,39 @@ function App() {
               <span className="feeding-total-note">Total feedings logged.</span>
             </div>
           </div>
-          <button className="primary" onClick={handleAdd}>
-            Log 🍼
-          </button>
+          <div className="feeding-actions">
+            <button className="primary" onClick={handleAdd}>
+              Log Feeding 🍼
+            </button>
+            <button className="ghost" onClick={openManual}>
+              Manual add feeding 🍼
+            </button>
+          </div>
         </section>
+
+        {manualOpen && (
+          <section className="manual-card">
+            <div className="manual-card__header">
+              <p className="eyebrow">Manual feeding</p>
+              <button className="ghost" onClick={cancelManual}>
+                Cancel
+              </button>
+            </div>
+            <label className="manual-card__field">
+              <span>Date & time</span>
+              <input
+                type="datetime-local"
+                value={manualDateTime}
+                onChange={(e) => setManualDateTime(e.target.value)}
+              />
+            </label>
+            <div className="manual-card__actions">
+              <button className="primary" onClick={handleManualAdd}>
+                Save feeding
+              </button>
+            </div>
+          </section>
+        )}
 
         <section className="next">
           <div>
@@ -320,7 +377,6 @@ function App() {
           </div>
         </section>
 
-
         <section className="averages" aria-label="Average intervals">
           <div className="average-card">
             <p className="eyebrow">All time average</p>
@@ -343,7 +399,7 @@ function App() {
             </div>
           </div>
           <button className="primary" onClick={handleAddDiaper}>
-            Log 💩
+            Log diaper 💩
           </button>
         </section>
 
@@ -356,7 +412,7 @@ function App() {
           <div className="diaper-card">
             <p className="eyebrow">Today</p>
             <h3>{diaperCountsByDay.get(todayKey) || 0}</h3>
-            <p className="lede lede--small">Logged diapars so far today.</p>
+            <p className="lede lede--small">Logged diapers so far today.</p>
           </div>
         </section>
 
